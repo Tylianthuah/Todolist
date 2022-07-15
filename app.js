@@ -3,50 +3,50 @@ const app = express();
 const bodyParser = require('body-parser');
 const PORT = process.env.PORT || 3000;
 const ejs = require('ejs');
+const items = ["Buy Food", "Cook Food" , "Eat Food"];
+const workItems = [];
+const day = require("./date")
 
+//Initializing
 app.set('view engine', 'ejs');
+app.use(bodyParser.urlencoded({extended: true}))
+app.use(express.static("public"));
 
+
+// Root Route
 app.get('/', (req, res) => {
-  const date = new Date();
-  const today = date.getDay();
-
-  switch (today) {
-    case 0:
-      day = 'Sunday';
-      break;
-
-    case 1:
-      day = 'Monday';
-      break;
-
-    case 2:
-      day = 'Tuesday';
-      break;
-
-    case 3:
-      day = 'Wednesday';
-      break;
-
-    case 4:
-      day = 'Thursday';
-      break;
-
-    case 5:
-      day = 'Friday';
-      break;
-
-    case 6:
-      day = 'Saturday';
-      break;
-
-    default:
-        res.send("invalid input")
-      break;
-  }
-
-res.render("list" , {day: day});
+  res.render("list" , {listTitle: day , newItems: items });
 });
 
+
+// Root post 
+app.post("/" , (req,res) => {
+    const item = req.body.todoItem;
+    if(req.body.list === "Work") {
+      workItems.push(item);
+      res.redirect("/work")
+    } else {
+
+      items.push(item);
+    res.redirect("/");
+    }
+})
+
+
+// work Route
+app.get("/work" , (req,res) => {
+   res.render("list" ,{ listTitle: "Work List" , newItems: workItems })
+})
+
+
+// About Route
+app.get("/about", (req,res) => {
+  res.render("about")
+})
+
+
+// listening to port...
 app.listen(PORT, () => {
   console.log('Server is running.....');
 });
+
